@@ -1,0 +1,7 @@
+<?php
+
+namespace {{ namespace }}\DTOs\{{ class }};
+
+use Jponchiroli\LaravelBase\Base\BaseCreateDTO;
+
+class {{ class }}CreateDTO extends BaseCreateDTO {}

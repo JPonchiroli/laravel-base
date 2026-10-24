@@ -1,0 +1,7 @@
+<?php
+
+namespace {{ namespace }}\DTOs\{{ class }};
+
+use Jponchiroli\LaravelBase\Base\BasePatchDTO;
+
+class {{ class }}PatchDTO extends BasePatchDTO {}

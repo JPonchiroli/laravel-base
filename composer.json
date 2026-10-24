@@ -1,0 +1,53 @@
+{
+    "name": "jponchiroli/laravel-base",
+    "description": "Base classes, standardized JSON responses with i18n messages (en, pt_BR) and a make:domain generator for Laravel API domains.",
+    "keywords": ["laravel", "api", "base", "generator", "scaffolding", "resource", "validation", "i18n"],
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/JPonchiroli/laravel-base",
+    "authors": [
+        {
+            "name": "Joao Pedro Ferreira Ponchiroli",
+            "email": "joaopedroponqueroli@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/JPonchiroli/laravel-base/issues",
+        "source": "https://github.com/JPonchiroli/laravel-base"
+    },
+    "require": {
+        "php": "^8.3",
+        "laravel/framework": "^13.0"
+    },
+    "require-dev": {
+        "laravel/pint": "~1.32.0",
+        "orchestra/testbench": "^11.0",
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jponchiroli\\LaravelBase\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Jponchiroli\\LaravelBase\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Jponchiroli\\LaravelBase\\LaravelBaseServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "pint --test"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

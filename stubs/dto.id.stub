@@ -1,0 +1,19 @@
+<?php
+
+namespace {{ namespace }}\DTOs\{{ class }};
+
+use Jponchiroli\LaravelBase\Base\BaseDTO;
+
+class {{ class }}IdDTO extends BaseDTO
+{
+    public function __construct(
+        public string $id,
+    ) {}
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            id: (string) $data['id'],
+        );
+    }
+}

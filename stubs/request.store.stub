@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }}\Http\Requests\{{ class }};
+
+use Illuminate\Contracts\Validation\ValidationRule;
+use Jponchiroli\LaravelBase\Base\BaseRequest;
+
+class {{ class }}StoreRequest extends BaseRequest
+{
+    /**
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [];
+    }
+}

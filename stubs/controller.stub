@@ -1,0 +1,72 @@
+<?php
+
+namespace {{ namespace }}\Http\Controllers;
+
+use {{ namespace }}\DTOs\{{ class }}\{{ class }}CreateDTO;
+use {{ namespace }}\DTOs\{{ class }}\{{ class }}IdDTO;
+use {{ namespace }}\DTOs\{{ class }}\{{ class }}IndexDTO;
+use {{ namespace }}\DTOs\{{ class }}\{{ class }}PatchDTO;
+use {{ namespace }}\DTOs\{{ class }}\{{ class }}UpdateDTO;
+use {{ namespace }}\Http\Requests\{{ class }}\{{ class }}DeleteRequest;
+use {{ namespace }}\Http\Requests\{{ class }}\{{ class }}IndexRequest;
+use {{ namespace }}\Http\Requests\{{ class }}\{{ class }}PatchRequest;
+use {{ namespace }}\Http\Requests\{{ class }}\{{ class }}StoreRequest;
+use {{ namespace }}\Http\Requests\{{ class }}\{{ class }}UpdateRequest;
+use {{ namespace }}\Services\{{ class }}\{{ class }}Service;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Jponchiroli\LaravelBase\Base\BaseMessageResource;
+use Jponchiroli\LaravelBase\Base\BaseResource;
+use Jponchiroli\LaravelBase\Base\BaseStoreResource;
+
+class {{ class }}Controller extends Controller
+{
+    public function __construct(
+        protected {{ class }}Service $service
+    ) {}
+
+    public function index({{ class }}IndexRequest $request): AnonymousResourceCollection
+    {
+        ${{ plural }} = $this->service->getPaginate({{ class }}IndexDTO::fromArray($request->validated()));
+
+        return BaseResource::collection(${{ plural }});
+    }
+
+    public function show(string $id): BaseResource
+    {
+        $model = $this->service->getById({{ class }}IdDTO::fromArray(['id' => $id])) ?? abort(404);
+
+        return new BaseResource($model);
+    }
+
+    public function store({{ class }}StoreRequest $request): BaseStoreResource
+    {
+        $model = $this->service->store({{ class }}CreateDTO::fromArray($request->validated()));
+
+        return new BaseStoreResource($model);
+    }
+
+    public function update({{ class }}UpdateRequest $request, string $id): BaseResource
+    {
+        $dto = {{ class }}UpdateDTO::fromArray([...$request->validated(), 'id' => $id]);
+
+        $model = $this->service->update($dto) ?? abort(404);
+
+        return new BaseResource($model, 'update');
+    }
+
+    public function patch({{ class }}PatchRequest $request, string $id): BaseResource
+    {
+        $dto = {{ class }}PatchDTO::fromArray([...$request->validated(), 'id' => $id]);
+
+        $model = $this->service->patch($dto) ?? abort(404);
+
+        return new BaseResource($model, 'update');
+    }
+
+    public function destroy({{ class }}DeleteRequest $request): BaseMessageResource
+    {
+        $this->service->delete({{ class }}IdDTO::fromArray($request->validated())) || abort(404);
+
+        return new BaseMessageResource;
+    }
+}

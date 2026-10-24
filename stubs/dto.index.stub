@@ -1,0 +1,7 @@
+<?php
+
+namespace {{ namespace }}\DTOs\{{ class }};
+
+use Jponchiroli\LaravelBase\Base\BaseIndexDTO;
+
+class {{ class }}IndexDTO extends BaseIndexDTO {}

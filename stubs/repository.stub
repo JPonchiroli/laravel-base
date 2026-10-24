@@ -1,0 +1,14 @@
+<?php
+
+namespace {{ namespace }}\Repositories\{{ class }};
+
+use {{ namespace }}\Models\{{ class }};
+use Jponchiroli\LaravelBase\Base\BaseRepositoryImpl;
+
+class {{ class }}Repository extends BaseRepositoryImpl
+{
+    public function __construct({{ class }} $model)
+    {
+        parent::__construct($model);
+    }
+}
