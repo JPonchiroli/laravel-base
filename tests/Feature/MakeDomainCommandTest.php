@@ -123,6 +123,26 @@ class MakeDomainCommandTest extends TestCase
     }
 
     #[Test]
+    public function it_creates_the_migration_of_the_domain_once(): void
+    {
+        $this->artisan('make:domain', ['name' => 'blog_post'])->assertSuccessful();
+        $this->artisan('make:domain', ['name' => 'blog_post'])->expectsOutputToContain('Migration already exists: create_blog_posts_table')->assertSuccessful();
+
+        $migrations = glob(database_path('migrations/*_create_blog_posts_table.php'));
+
+        $this->assertCount(1, $migrations);
+        $this->assertStringContainsString("Schema::create('blog_posts'", file_get_contents($migrations[0]));
+    }
+
+    #[Test]
+    public function no_migration_skips_the_migration(): void
+    {
+        $this->artisan('make:domain', ['name' => 'Note', '--no-migration' => true])->assertSuccessful();
+
+        $this->assertSame([], glob(database_path('migrations/*_create_notes_table.php')));
+    }
+
+    #[Test]
     public function it_normalizes_the_name_and_namespace(): void
     {
         $this->artisan('make:domain', ['name' => 'blog_post'])->assertSuccessful();

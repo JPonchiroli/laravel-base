@@ -12,7 +12,7 @@ New entity, resource or CRUD endpoint set:
 php artisan make:domain Product
 ```
 
-The command is idempotent: it never overwrites an existing file (it prints `Already exists: <path>` and moves on) and never registers the same routes twice. Use `--no-routes` to skip `routes/api.php`.
+The command is idempotent: it never overwrites an existing file (it prints `Already exists: <path>` and moves on) and never registers the same routes twice. Use `--no-routes` to skip `routes/api.php`, `--no-migration` to skip the migration and `--no-docs` to skip the OpenAPI classes `app/Docs/SchemaDocs.php` and `app/Docs/Product/ProductDocs.php`. After filling the Request rules or running the migration, run `php artisan domain:docs Product` to rewrite `ProductDocs.php` (manual edits are lost); Swagger UI is served at `/docs`.
 
 ## What the command creates (example: `Product`)
 
@@ -48,7 +48,7 @@ Route::prefix('v1/products')->group(function () {
 
 ## The only manual edits (3)
 
-1. **Migration and model.** `php artisan make:migration create_products_table --create=products`, define the columns, run `php artisan migrate`, then set `protected $fillable = ['name', 'price'];` in the model.
+1. **Migration and model.** `make:domain` already created `database/migrations/..._create_products_table.php`: define the columns, run `php artisan migrate`, then set `protected $fillable = ['name', 'price'];` in the model.
 2. **Request rules.** Rules are the only place where fields are declared; fields not in the rules never reach the database.
    - `ProductStoreRequest` / `ProductUpdateRequest`: `'name' => ['required', 'string', 'max:100']`, `'price' => ['nullable', 'numeric', 'min:0']`.
    - `ProductPatchRequest`: same fields with `sometimes` instead of `required`.

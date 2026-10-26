@@ -3,6 +3,8 @@
 ```bash
 php artisan make:domain Product            # classes + routes
 php artisan make:domain Product --no-routes # classes only
+php artisan make:domain Product --no-docs   # skip app/Docs/Product/ProductDocs.php
+php artisan make:domain Product --no-migration # skip the migration
 ```
 
 The name is normalized with `Str::studly` (`product`, `blog_post`, `blog-post` and `blogPost` all work) and must then match `^[A-Z][A-Za-z0-9]*$`, otherwise the command prints `Invalid name: ...` and fails.
@@ -64,6 +66,27 @@ When `routes/api.php` exists and the controller is not referenced yet, the comma
 
 Running the command twice never duplicates the import or the routes.
 
+## OpenAPI documentation
+
+Unless `--no-docs` is given, the command also writes [swagger-php](https://zircote.github.io/swagger-php/) classes (`OA` attributes) in `app/Docs/`:
+
+| File | Content |
+|---|---|
+| `Docs/SchemaDocs.php` | Created once. `#[OA\Info]`, one `#[OA\Tag]` per domain (added by every `make:domain`) and the shared schemas `Error`, `ValidationError` and `Message` |
+| `Docs/Product/ProductDocs.php` | The six endpoints plus the schemas of the domain: `Product` (model), `ProductStoreRequest`, `ProductUpdateRequest`, `ProductPatchRequest`, `ProductResource` and `ProductCollection` |
+
+- **Request fields** come from `rules()` of the domain Requests (query parameters for `index`, JSON body for `store`, `update` and `patch`). String rules are mapped to type, format, `required`, `nullable`, `min`/`max` and `in`; rule objects, nested and wildcard fields are ignored.
+- **Model fields** come from the columns of the model table, read through the connection of the model. `make:domain` uses only `id`, `created_at` and `updated_at` while the table does not exist yet, but `domain:docs` never does: when the model or its table is missing it prints an error (`Domain Ghost not found: ...` or `Table 'products' not found: run the migration first.`), writes nothing and exits with failure. With no name, domains that fail are skipped and the others are still updated.
+- Error responses (401, 403, 404, 422, 500) reference the shared schemas.
+
+At generation time the Store, Update and Patch rules are empty and the table usually does not exist, so run `php artisan domain:docs Product` after filling them and migrating (or `php artisan domain:docs` without a name for every domain, even those without a docs class yet). It rewrites `ProductDocs.php`, so manual edits there are lost; `make:domain` never overwrites it. `SchemaDocs.php` is never rewritten.
+
+`make:domain` and `domain:docs` also write the merged document to `storage/api-docs/openapi.json`. Swagger UI is served at `/docs` and reads `/docs/openapi.json`, which returns that file (or scans `app/Docs` when the file does not exist yet). After editing `app/Docs` by hand, run `php artisan domain:docs` to refresh it. Change or disable it with the `swagger` config key. Only the six stub routes are documented.
+
+## Migration
+
+As the last step the command runs Laravel's `make:migration create_products_table --create=products` (table name: snake-case plural of the entity, the same the model uses). If a `*_create_products_table.php` migration already exists it prints `Migration already exists: create_products_table` and creates nothing. Use `--no-migration` to skip it. The migration is only the empty Laravel template: define the columns, run `php artisan migrate` and then `php artisan domain:docs Product` so the model schema of the docs gets the new columns.
+
 ## Stubs and placeholders
 
 Stubs are in `stubs/*.stub`. To change generated code project-wide, publish them:
@@ -92,4 +115,4 @@ Earlier versions generated Requests directly in `app/Http/Requests/`. They are n
 
 ## After generating
 
-Three manual steps remain: the migration and `$fillable`, the Request rules, and a smoke test. [getting-started.md](getting-started.md) walks through them and [ai-agent-guide.md](ai-agent-guide.md) has the checklist.
+Three manual steps remain: the columns of the generated migration and `$fillable`, the Request rules, and a smoke test. [getting-started.md](getting-started.md) walks through them and [ai-agent-guide.md](ai-agent-guide.md) has the checklist.

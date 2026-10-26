@@ -41,6 +41,7 @@ Locale values must look like a locale code (`en`, `pt_BR`, `es-MX`); anything el
 | `exception_handler` | `true` | Registers the standardized JSON error responses for `api/*` and JSON requests |
 | `route_prefix` | `v1` | Prefix used by generated routes (`v1/products`) |
 | `generate_routes` | `true` | `make:domain` registers routes unless `--no-routes` is passed |
+| `swagger` | `enabled: APP_ENV != production`, `route: docs`, `middleware: []`, `title: APP_NAME` | Serves Swagger UI at `/{route}` by scanning the `OA` attribute classes in `app/Docs` (requires `zircote/swagger-php`, installed with the package). Off in production by default because it lists every endpoint; set `enabled` to `true` there only together with `middleware` (e.g. `['auth:sanctum']`) |
 
 The config is merged with the package defaults, so the published file can contain only the keys you change.
 

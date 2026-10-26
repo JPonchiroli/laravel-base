@@ -3,6 +3,7 @@
 namespace Jponchiroli\LaravelBase\Tests;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Jponchiroli\LaravelBase\LaravelBaseServiceProvider;
@@ -31,6 +32,8 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        $this->migrations = glob(database_path('migrations/*.php')) ?: [];
+
         Schema::create('widgets', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
@@ -38,6 +41,22 @@ abstract class TestCase extends BaseTestCase
             $table->unsignedInteger('qty')->nullable();
             $table->timestamps();
         });
+    }
+
+    /**
+     * @var list<string>
+     */
+    private array $migrations = [];
+
+    protected function tearDown(): void
+    {
+        $files = new Filesystem;
+
+        $files->deleteDirectory(app_path('Docs'));
+        $files->deleteDirectory(storage_path('api-docs'));
+        $files->delete(array_diff(glob(database_path('migrations/*.php')) ?: [], $this->migrations));
+
+        parent::tearDown();
     }
 
     /**
