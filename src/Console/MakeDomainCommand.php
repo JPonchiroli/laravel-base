@@ -5,11 +5,14 @@ namespace Jponchiroli\LaravelBase\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
+use Jponchiroli\LaravelBase\Docs\OpenApiBuilder;
 
 class MakeDomainCommand extends Command
 {
     protected $signature = 'make:domain {name : Entity name, e.g. Post}
-        {--no-routes : Do not register the routes in routes/api.php}';
+        {--no-routes : Do not register the routes in routes/api.php}
+        {--no-docs : Do not generate the OpenAPI classes in app/Docs}
+        {--no-migration : Do not create the migration of the domain}';
 
     protected $description = 'Generate the Model, Controller, Service, Repository, DTOs and Requests of a domain';
 
@@ -50,7 +53,57 @@ class MakeDomainCommand extends Command
             $this->registerRoutes($files, $name, $replacements);
         }
 
+        if (! $this->option('no-docs')) {
+            $this->writeDocs($files, $name);
+        }
+
+        if (! $this->option('no-migration')) {
+            $this->makeMigration($name);
+        }
+
         return self::SUCCESS;
+    }
+
+    protected function writeDocs(Filesystem $files, string $name): void
+    {
+        $path = OpenApiBuilder::domainPath($name);
+        $builder = new OpenApiBuilder;
+
+        $builder->ensureBase($files, $name);
+        $baseWarnings = $builder->warnings;
+
+        if ($files->exists($path)) {
+            $this->warn("Already exists: {$path}");
+        } else {
+            $files->ensureDirectoryExists(dirname($path));
+            $files->put($path, $builder->domainSource($name));
+
+            $this->info("Created: {$path}");
+        }
+
+        // the table does not exist yet on first generation, so its warning is only useful in domain:docs
+        $builder->warnings = $baseWarnings;
+
+        if ($builder->writeJson($files)) {
+            $this->info('Created: '.OpenApiBuilder::jsonPath());
+        }
+
+        foreach ($builder->warnings as $warning) {
+            $this->warn($warning);
+        }
+    }
+
+    protected function makeMigration(string $name): void
+    {
+        $table = Str::snake(Str::plural($name));
+
+        if (glob(database_path("migrations/*_create_{$table}_table.php"))) {
+            $this->warn("Migration already exists: create_{$table}_table");
+
+            return;
+        }
+
+        $this->call('make:migration', ['name' => "create_{$table}_table", '--create' => $table]);
     }
 
     /**

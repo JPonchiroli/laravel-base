@@ -8,15 +8,13 @@ A complete walkthrough: from an installed package to a working CRUD for a `Produ
 php artisan make:domain Product
 ```
 
-This creates the model, controller, service, repository, DTOs and Requests of the entity, and registers the routes in `routes/api.php`. The full list of files, the stub placeholders and the route registration are in [make-domain.md](make-domain.md). Use `--no-routes` to skip the routes.
+This creates the model, controller, service, repository, DTOs and Requests of the entity, registers the routes in `routes/api.php`, writes the Swagger/OpenAPI docs and creates the migration of the table. The full list of files, the stub placeholders and the route registration are in [make-domain.md](make-domain.md). Use `--no-routes`, `--no-docs` and `--no-migration` to skip each of them.
 
 The service, repository, DTOs and `ProductDeleteRequest` work as generated. Only steps 2 and 3 are manual.
 
 ## 2. Create the table and configure the model
 
-```bash
-php artisan make:migration create_products_table --create=products
-```
+`make:domain` already created the migration (`create_products_table`, run with `--no-migration` to skip it). Open it in `database/migrations` and define the columns:
 
 ```php
 // database/migrations/..._create_products_table.php

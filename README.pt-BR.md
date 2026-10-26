@@ -59,7 +59,7 @@ Detalhes em [docs/ai-agent-guide.md](docs/ai-agent-guide.md).
 
 ## Publicando uma versão
 
-Planejado para a próxima versão: documentação Swagger/OpenAPI automática, gerada por um comando do Artisan a partir das rotas, Requests e Resources existentes.
+O `make:domain` também gera a documentação Swagger/OpenAPI de cada domínio (`app/Docs/`, attributes do swagger-php), a partir das regras dos Requests e das colunas da tabela, servida em `/docs`. Atualize com `php artisan domain:docs`.
 
 ## Licença
 
